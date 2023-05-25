@@ -18,12 +18,22 @@ public class BookController
     @Autowired
     BookService bookService;
 
+    // add book
     @PostMapping("/add")
-    public BookResponseDto addBook(@RequestBody BookRequestDto bookRequestDto) {
+    public ResponseEntity addBook(@RequestBody BookRequestDto bookRequestDto) {
 
-        return bookService.addBook(bookRequestDto);
+        try
+        {
+            BookResponseDto bookResponseDto = bookService.addBook(bookRequestDto);
+            return new ResponseEntity(bookResponseDto, HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity(e.getMessage(),HttpStatus.ACCEPTED);
+        }
     }
 
+    // get booklist by author name
     @GetMapping("/get_books_by_authorname")
     public ResponseEntity getBookListByAuthorName(@RequestParam("name") String authorName)
     {
@@ -31,12 +41,12 @@ public class BookController
         try
         {
             bookList = bookService.getBookListByAuthorName(authorName);
+            //return new ResponseEntity(bookList,HttpStatus.FOUND);
         }
         catch (Exception e)
         {
             return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity<>(bookList,HttpStatus.FOUND);
+        return new ResponseEntity(bookList,HttpStatus.FOUND);
     }
 }

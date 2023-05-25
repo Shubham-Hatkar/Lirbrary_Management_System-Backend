@@ -5,6 +5,9 @@ public enum Department
     CS,
     IT,
     MECH,
-    EE,
-    BIOTECH
+    BIOTECH,
+    CHEMISTRY,
+    HISTORY,
+    ART
+
 }

@@ -22,6 +22,7 @@ public class TransactionController
     @Autowired
     TransactionService transactionService;
 
+    // Issue Book
     @PostMapping("/issue")
     public ResponseEntity issueBook(@RequestBody IssueBookRequest issueBookRequest)
     {
@@ -37,6 +38,7 @@ public class TransactionController
         return new ResponseEntity(issueBookResponse, HttpStatus.ACCEPTED);
     }
 
+    // Return Book
     @PostMapping("/return")
     public ResponseEntity returnBook(@RequestBody ReturnBookRequestDto returnBookRequestDto)
     {

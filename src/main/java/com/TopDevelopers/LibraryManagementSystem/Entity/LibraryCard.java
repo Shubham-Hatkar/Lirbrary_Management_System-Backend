@@ -25,7 +25,6 @@ public class LibraryCard
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cardNo;
 
-
     @Enumerated(EnumType.STRING)
     private CardStatus status;
 

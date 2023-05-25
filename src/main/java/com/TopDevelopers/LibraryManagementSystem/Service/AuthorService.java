@@ -6,6 +6,7 @@ import com.TopDevelopers.LibraryManagementSystem.Repository.AuthorRepositoty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,8 +26,14 @@ public class AuthorService
         authorRepositoty.save(author);
     }
 
-    public List<Author> getAllAuthors()
+    public List<String> getAllAuthors()
     {
-        return authorRepositoty.findAll();
+        List<Author> authors =  authorRepositoty.findAll();
+        List<String> authorList = new ArrayList<>();
+        for(Author author : authors)
+        {
+            authorList.add(author.getName());
+        }
+        return authorList;
     }
 }

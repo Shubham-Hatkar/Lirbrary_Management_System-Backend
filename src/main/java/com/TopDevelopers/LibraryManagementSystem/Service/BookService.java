@@ -4,6 +4,7 @@ import com.TopDevelopers.LibraryManagementSystem.DTO.BookRequestDto;
 import com.TopDevelopers.LibraryManagementSystem.DTO.BookResponseDto;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Author;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Book;
+import com.TopDevelopers.LibraryManagementSystem.Exceptions.AuthorNotFoundException;
 import com.TopDevelopers.LibraryManagementSystem.Repository.AuthorRepositoty;
 import com.TopDevelopers.LibraryManagementSystem.Repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,18 @@ public class BookService {
     AuthorRepositoty authorRepositoty;
 
 
-    public BookResponseDto addBook(BookRequestDto bookRequestDto)
-    {
+    // add book (to author)
+    public BookResponseDto addBook(BookRequestDto bookRequestDto) throws AuthorNotFoundException {
         // get the author obj
-        Author author = authorRepositoty.findById(bookRequestDto.getAuthorId()).get();
-
+        Author author;
+        try
+        {
+            author = authorRepositoty.findById(bookRequestDto.getAuthorId()).get();
+        }
+        catch (Exception e)
+        {
+            throw new AuthorNotFoundException();
+        }
         Book book = new Book();
         book.setTitle(bookRequestDto.getTitle());
         book.setGenre(bookRequestDto.getGenre());
@@ -41,15 +49,12 @@ public class BookService {
         return bookResponseDto;
     }
 
-    public List<String> getBookListByAuthorName(String authorName) throws Exception {
-        Author author;
-        try
+    // Get booklist by author Name
+    public List<String> getBookListByAuthorName(String authorName) throws AuthorNotFoundException {
+        Author author = authorRepositoty.findByName(authorName);
+        if(author == null)
         {
-            author = authorRepositoty.findByName(authorName);
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Author not exist");
+            throw new AuthorNotFoundException();
         }
         List<Book> bookList = author.getBooks();
         List<String> books = new ArrayList<>();

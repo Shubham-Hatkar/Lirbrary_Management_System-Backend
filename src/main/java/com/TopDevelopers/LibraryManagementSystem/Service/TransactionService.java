@@ -6,11 +6,13 @@ import com.TopDevelopers.LibraryManagementSystem.DTO.ReturnBookRequestDto;
 import com.TopDevelopers.LibraryManagementSystem.DTO.ReturnBookResponseDto;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Book;
 import com.TopDevelopers.LibraryManagementSystem.Entity.LibraryCard;
+import com.TopDevelopers.LibraryManagementSystem.Entity.Student;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Transaction;
 import com.TopDevelopers.LibraryManagementSystem.Enum.CardStatus;
 import com.TopDevelopers.LibraryManagementSystem.Enum.TransactionStatus;
 import com.TopDevelopers.LibraryManagementSystem.Repository.BookRepository;
 import com.TopDevelopers.LibraryManagementSystem.Repository.LibraryCardRepository;
+import com.TopDevelopers.LibraryManagementSystem.Repository.StudentRepository;
 import com.TopDevelopers.LibraryManagementSystem.Repository.TransactionRepository;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +27,19 @@ public class TransactionService
     LibraryCardRepository libraryCardRepository;
 
     @Autowired
+    StudentRepository studentRepository;
+
+    @Autowired
     BookRepository bookRepository;
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    StudentService studentService;
+
+    @Autowired
+    EmailService emailService;
 
     public IssueBookResponse issueBook(IssueBookRequest issueBookRequest) throws Exception {
 
@@ -92,7 +103,19 @@ public class TransactionService
         transaction.setTransactionStatus(TransactionStatus.SUCCESS);
         transaction.setMessage("Book is issued successfully.");
 
+        // send email to student
+        Student student = studentService.studentGetByLibraryId(card.getCardNo());
+        String toMail = student.getEmail();
+        String subject = "Book Issued";
+        String message = "Hello " + student.getName() + ", \n" + "Congratulations, the book '" +
+                          book.getTitle() + "' Issued successfully to you. We hope after reading " +
+                          "this book you will get something excellent." + "\n \n" +
+                          "      Thanks and Regards \n Library Management System \n" +
+                          "(Developer Contact : shubhamhatkar@gmail.com)";
+        emailService.sendEmail(toMail, subject, message);
+
         libraryCardRepository.save(card); // this will save book and transaction also
+
 
         // responseDto
         IssueBookResponse issueBookResponse = new IssueBookResponse();
@@ -152,7 +175,7 @@ public class TransactionService
 
         // i can return a book
         book.setIssued(false); // returning book
-        book.setCard(card);
+        book.setCard(null);
         book.getTransactions().add(transaction);
         card.getTransactionList().add(transaction);
         card.getBooksIssued().remove(book);

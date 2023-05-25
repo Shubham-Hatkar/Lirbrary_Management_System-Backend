@@ -7,9 +7,14 @@ import com.TopDevelopers.LibraryManagementSystem.DTO.StudentResponseToUpdateEmai
 import com.TopDevelopers.LibraryManagementSystem.Entity.LibraryCard;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Student;
 import com.TopDevelopers.LibraryManagementSystem.Enum.CardStatus;
+import com.TopDevelopers.LibraryManagementSystem.Exceptions.EmailAlreadyRegisteredException;
+import com.TopDevelopers.LibraryManagementSystem.Exceptions.NoStudentFoundWithThisEmailException;
+import com.TopDevelopers.LibraryManagementSystem.Exceptions.StudentNotFoundException;
+import com.TopDevelopers.LibraryManagementSystem.Repository.LibraryCardRepository;
 import com.TopDevelopers.LibraryManagementSystem.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +24,11 @@ public class StudentService {
     @Autowired
     StudentRepository studentRepository;
 
-    public void addStudent(StudentAddRequestDto studentAddRequestDto)
-    {
+    @Autowired
+    LibraryCardRepository libraryCardRepository;
+
+    // Add Student
+    public void addStudent(StudentAddRequestDto studentAddRequestDto) throws EmailAlreadyRegisteredException {
         // create a student object
         Student student = new Student();
         student.setName(studentAddRequestDto.getName());
@@ -34,22 +42,51 @@ public class StudentService {
         card.setStudent(student); // set the student to card
 
         student.setCard(card);
-        studentRepository.save(student); // will save student and card both
+        try
+        {
+            studentRepository.save(student);// will save student and card both
+        }
+        catch(Exception e)
+        {
+            throw new EmailAlreadyRegisteredException();
+        }
     }
 
-    public String findStudentByEmail(String email)
-    {
-        return studentRepository.findByEmail(email).getName();
+    // Find student by name
+    public String findStudentByEmail(String email) throws NoStudentFoundWithThisEmailException {
+        try
+        {
+            return studentRepository.findByEmail(email).getName();
+        }
+        catch (RuntimeException e)
+        {
+            throw new NoStudentFoundWithThisEmailException();
+        }
     }
 
-    public StudentResponseToUpdateEmail updateEmail(StudentEmailUpdateRequestDto studentEmailUpdateRequestDto)
-    {
-        Student student = studentRepository.findById(studentEmailUpdateRequestDto.getId()).get();
+    // Update email
+    public StudentResponseToUpdateEmail updateEmail(StudentEmailUpdateRequestDto studentEmailUpdateRequestDto) throws StudentNotFoundException {
+        Student student;
+        try
+        {
+            student = studentRepository.findById(studentEmailUpdateRequestDto.getId()).get();
+        }
+        catch (Exception e)
+        {
+            throw new StudentNotFoundException();
+        }
         student.setEmail(studentEmailUpdateRequestDto.getEmail());
 
         // save
-        Student updatedStudent = studentRepository.save(student);
-
+        Student updatedStudent;
+        try
+        {
+            updatedStudent = studentRepository.save(student);
+        }
+        catch (Exception e)
+        {
+            throw new StudentNotFoundException();
+        }
 
         // convert updatedStudent to DTO
         StudentResponseToUpdateEmail studentResponseDto = new StudentResponseToUpdateEmail();
@@ -60,6 +97,7 @@ public class StudentService {
         return studentResponseDto;
     }
 
+    // Get all Students
     public List<String> getAllStudent()
     {
         List<Student> studentList = studentRepository.findAll();
@@ -71,11 +109,18 @@ public class StudentService {
         return ans;
     }
 
-    public StudentGetByNameResponseDto getStudentByName(String studentName)
-    {
+    // Student get By studentName
+    public StudentGetByNameResponseDto getStudentByName(String studentName) throws StudentNotFoundException {
         StudentGetByNameResponseDto studentGetByNameResponseDto = new StudentGetByNameResponseDto();
-        Student student = studentRepository.findByName(studentName);
-
+        Student student;
+        try
+        {
+            student = studentRepository.findByName(studentName);
+        }
+        catch (Exception e)
+        {
+            throw new StudentNotFoundException();
+        }
         studentGetByNameResponseDto.setName(student.getName());
         studentGetByNameResponseDto.setAge(student.getAge());
         studentGetByNameResponseDto.setDepartment(String.valueOf(student.getDepartment()));
@@ -83,4 +128,19 @@ public class StudentService {
 
         return studentGetByNameResponseDto;
     }
+
+    // Student get By Library card ID no.
+    public Student studentGetByLibraryId(int libraryCardId) throws Exception {
+        Student student;
+        LibraryCard card;
+        try{
+            card = libraryCardRepository.findById(libraryCardId).get();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.getMessage());
+        }
+        return card.getStudent();
+    }
+
 }
