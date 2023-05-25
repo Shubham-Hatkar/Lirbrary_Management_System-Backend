@@ -9,6 +9,7 @@ import com.TopDevelopers.LibraryManagementSystem.Repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,6 +17,7 @@ public class BookService {
 
     @Autowired
     AuthorRepositoty authorRepositoty;
+
 
     public BookResponseDto addBook(BookRequestDto bookRequestDto)
     {
@@ -37,5 +39,24 @@ public class BookService {
         bookResponseDto.setPrice(book.getPrice());
         bookResponseDto.setTitle(book.getTitle());
         return bookResponseDto;
+    }
+
+    public List<String> getBookListByAuthorName(String authorName) throws Exception {
+        Author author;
+        try
+        {
+            author = authorRepositoty.findByName(authorName);
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Author not exist");
+        }
+        List<Book> bookList = author.getBooks();
+        List<String> books = new ArrayList<>();
+        for(Book book : bookList)
+        {
+            books.add(book.getTitle());
+        }
+        return books;
     }
 }

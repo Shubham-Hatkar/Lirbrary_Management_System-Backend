@@ -5,10 +5,11 @@ import com.TopDevelopers.LibraryManagementSystem.DTO.BookResponseDto;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Book;
 import com.TopDevelopers.LibraryManagementSystem.Service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/book")
@@ -21,5 +22,21 @@ public class BookController
     public BookResponseDto addBook(@RequestBody BookRequestDto bookRequestDto) {
 
         return bookService.addBook(bookRequestDto);
+    }
+
+    @GetMapping("/get_books_by_authorname")
+    public ResponseEntity getBookListByAuthorName(@RequestParam("name") String authorName)
+    {
+        List<String> bookList;
+        try
+        {
+            bookList = bookService.getBookListByAuthorName(authorName);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(bookList,HttpStatus.FOUND);
     }
 }
