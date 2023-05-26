@@ -7,15 +7,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-
 @Getter
 @Setter
 public class EmailService
 {
     @Autowired
     JavaMailSender javaMailSender;
-
-
 
     public void sendEmail(String toEmail, String subject, String message)
     {

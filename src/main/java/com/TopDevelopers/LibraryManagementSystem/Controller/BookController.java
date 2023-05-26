@@ -2,6 +2,7 @@ package com.TopDevelopers.LibraryManagementSystem.Controller;
 
 import com.TopDevelopers.LibraryManagementSystem.DTO.BookRequestDto;
 import com.TopDevelopers.LibraryManagementSystem.DTO.BookResponseDto;
+import com.TopDevelopers.LibraryManagementSystem.DTO.GetAllBooksResponseDto;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Book;
 import com.TopDevelopers.LibraryManagementSystem.Service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,12 @@ public class BookController
             return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(bookList,HttpStatus.FOUND);
+    }
+
+    // Get all books
+    @GetMapping("/get_all_books")
+    public ResponseEntity getAllBooks()
+    {
+        return new ResponseEntity(bookService.getAllBooks(),HttpStatus.ACCEPTED);
     }
 }

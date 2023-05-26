@@ -2,12 +2,14 @@ package com.TopDevelopers.LibraryManagementSystem.Service;
 
 import com.TopDevelopers.LibraryManagementSystem.DTO.BookRequestDto;
 import com.TopDevelopers.LibraryManagementSystem.DTO.BookResponseDto;
+import com.TopDevelopers.LibraryManagementSystem.DTO.GetAllBooksResponseDto;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Author;
 import com.TopDevelopers.LibraryManagementSystem.Entity.Book;
 import com.TopDevelopers.LibraryManagementSystem.Exceptions.AuthorNotFoundException;
 import com.TopDevelopers.LibraryManagementSystem.Repository.AuthorRepositoty;
 import com.TopDevelopers.LibraryManagementSystem.Repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +20,9 @@ public class BookService {
 
     @Autowired
     AuthorRepositoty authorRepositoty;
+
+    @Autowired
+    BookRepository bookRepository;
 
 
     // add book (to author)
@@ -63,5 +68,24 @@ public class BookService {
             books.add(book.getTitle());
         }
         return books;
+    }
+
+    public List<GetAllBooksResponseDto> getAllBooks()
+    {
+        List<Book> bookList = bookRepository.findAll();
+        List<GetAllBooksResponseDto> responseDtoList = new ArrayList<>();
+        for(Book book : bookList)
+        {
+            String bookName = book.getTitle();
+            int authorId = book.getAuthor().getId();
+            Author author = authorRepositoty.findById(authorId).get();
+            String authorName = author.getName();
+
+            GetAllBooksResponseDto getAllBooksResponseDto = new GetAllBooksResponseDto();
+            getAllBooksResponseDto.setBookName(bookName);
+            getAllBooksResponseDto.setAuthorName(authorName);
+            responseDtoList.add(getAllBooksResponseDto);
+        }
+        return responseDtoList;
     }
 }

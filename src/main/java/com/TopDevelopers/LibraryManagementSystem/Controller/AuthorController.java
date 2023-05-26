@@ -19,8 +19,14 @@ public class AuthorController
     @PostMapping("/add")
     public String addAuthor(@RequestBody AuthorAddRequest authorAddRequest)
     {
-        authorService.addAuthor(authorAddRequest);
-        return "Author has been added";
+        try{
+            authorService.addAuthor(authorAddRequest);
+            return "Author has beed added successfully";
+        }
+        catch (Exception e)
+        {
+            return e.getMessage();
+        }
     }
 
     // show all authors

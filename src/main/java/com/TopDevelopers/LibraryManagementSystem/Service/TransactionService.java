@@ -108,9 +108,10 @@ public class TransactionService
         String toMail = student.getEmail();
         String subject = "Book Issued";
         String message = "Hello " + student.getName() + ", \n" + "Congratulations, the book '" +
-                          book.getTitle() + "' Issued successfully to you. We hope after reading " +
+                          book.getTitle() + "' written by " + book.getAuthor().getName() + " is " +
+                          "Issued successfully to you. We hope after reading " +
                           "this book you will get something excellent." + "\n \n" +
-                          "      Thanks and Regards \n Library Management System \n" +
+                          "         Thanks and Regards \n   Library Management System \n" +
                           "(Developer Contact : shubhamhatkar@gmail.com)";
         emailService.sendEmail(toMail, subject, message);
 
