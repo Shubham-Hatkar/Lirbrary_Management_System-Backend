@@ -9,6 +9,7 @@ import com.TopDevelopers.LibraryManagementSystem.Entity.Student;
 import com.TopDevelopers.LibraryManagementSystem.Enum.CardStatus;
 import com.TopDevelopers.LibraryManagementSystem.Exceptions.EmailAlreadyRegisteredException;
 import com.TopDevelopers.LibraryManagementSystem.Exceptions.NoStudentFoundWithThisEmailException;
+import com.TopDevelopers.LibraryManagementSystem.Exceptions.StudentIdDoesNotExistException;
 import com.TopDevelopers.LibraryManagementSystem.Exceptions.StudentNotFoundException;
 import com.TopDevelopers.LibraryManagementSystem.Repository.LibraryCardRepository;
 import com.TopDevelopers.LibraryManagementSystem.Repository.StudentRepository;
@@ -26,6 +27,9 @@ public class StudentService {
 
     @Autowired
     LibraryCardRepository libraryCardRepository;
+
+    @Autowired
+    EmailService emailService;
 
     // Add Student
     public void addStudent(StudentAddRequestDto studentAddRequestDto) throws EmailAlreadyRegisteredException {
@@ -45,6 +49,20 @@ public class StudentService {
         try
         {
             studentRepository.save(student);// will save student and card both
+            String toMail = student.getEmail();
+            String subject = "You have successfully registered";
+            String message = "Hello " + student.getName() + ", \n" +
+                             "You have successfully registered as a student your details " + "are as follow - \n" +
+                             "Student Name : " + student.getName() + "\n" +
+                             "Student Email : " + student.getEmail() + "\n" +
+                             "Student Id : " + student.getId() + "\n" +
+                             "Student Department : " + student.getDepartment() + "\n" +
+                             "Student Age : " + student.getAge() + "\n" +
+                             "Student CardID  : " + student.getCard().getCardNo() + "\n" +
+                             "Note ::-> Please Dont Share Your Student-ID, Card-ID.";
+
+
+            emailService.sendEmail(toMail,subject,message);
         }
         catch(Exception e)
         {
@@ -143,4 +161,16 @@ public class StudentService {
         return card.getStudent();
     }
 
+    public void deleteStudentByStudentId(int studentId) throws StudentIdDoesNotExistException {
+
+        try
+        {
+            studentRepository.findById(studentId).get();
+        }
+        catch (Exception e)
+        {
+            throw new StudentIdDoesNotExistException();
+        }
+        studentRepository.deleteById(studentId);
+    }
 }

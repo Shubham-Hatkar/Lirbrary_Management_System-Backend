@@ -27,7 +27,6 @@ public class StudentController<student>
     LibraryCardRepository libraryCardRepository;
 
 
-
     @PostMapping("/add")
     public String addStudent(@RequestBody StudentAddRequestDto studentAddRequestDto)
     {
@@ -97,6 +96,19 @@ public class StudentController<student>
         catch (Exception e)
         {
             throw new Exception(e.getMessage());
+        }
+    }
+
+    // Delete Student by id
+    @DeleteMapping("/delete_student/{id}")
+    public String deleteStudentByStudentId(@PathVariable("id") int studentId) throws Exception {
+        try{
+            studentService.deleteStudentByStudentId(studentId);
+            return "Student deleted successfully";
+        }
+        catch (Exception e)
+        {
+            return e.getMessage() ;
         }
     }
 }
